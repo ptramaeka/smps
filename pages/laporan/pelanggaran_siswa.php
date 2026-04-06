@@ -2,6 +2,8 @@
 include_once __DIR__ . '/../../config/config.php';
 include ROOT_PATH . "/includes/header.php";
 
+smps_require_roles(['admin', 'bk', 'pengajar'], 'Akses ditolak. Halaman laporan hanya untuk admin/BK/pengajar.');
+
 // Query dasar untuk mengambil semua data pelanggaran siswa
 $sql = "SELECT * FROM pelanggaran_siswa 
         JOIN siswa ON pelanggaran_siswa.nis = siswa.nis

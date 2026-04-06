@@ -2,6 +2,8 @@
 include_once __DIR__ . '/../../config/config.php';
 include ROOT_PATH . "/includes/header.php";
 
+$_can_manage = smps_can_manage_data();
+
 // Query siswa AKTIF
 $result_aktif = mysqli_query($conn, "
     SELECT siswa.nis, siswa.nama_siswa, siswa.jenis_kelamin, siswa.alamat, siswa.status,
@@ -33,11 +35,13 @@ $result_nonaktif = mysqli_query($conn, "
     <div>
         <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--mocha);">Data Siswa</h2>
         <p style="color: #888;">Kelola data murid, kelas, dan informasi orang tua.</p>
-    </div>
-    <a href="add.php" class="btn btn-primary">
-        <i data-lucide="user-plus" style="width: 18px; vertical-align: middle; margin-right: 5px;"></i>
-        Tambah Siswa
-    </a>
+</div>
+    <?php if ($_can_manage): ?>
+        <a href="add.php" class="btn btn-primary">
+            <i data-lucide="user-plus" style="width: 18px; vertical-align: middle; margin-right: 5px;"></i>
+            Tambah Siswa
+        </a>
+    <?php endif; ?>
 </div>
 
 <!-- Siswa Aktif -->
@@ -73,18 +77,22 @@ $result_nonaktif = mysqli_query($conn, "
                         I: <?= htmlspecialchars($row['ibu'] ?: '-') ?>
                     </td>
                     <td>
-                        <div style="display: flex; gap: 5px;">
-                            <a href="edit.php?nis=<?= $row['nis'] ?>" class="btn" style="background: rgba(150, 126, 118, 0.1); color: var(--mocha); padding: 5px 12px;">
-                                <i data-lucide="edit-3" style="width: 14px;"></i>
-                            </a>
-                            <form action="<?= BASE_URL ?>/process/siswa_process.php" method="post" onsubmit="return confirm('Hapus <?= $row['nama_siswa'] ?>?')">
-                                <input type="hidden" name="nis" value="<?= $row['nis'] ?>">
-                                <input type="hidden" name="action" value="delete">
-                                <button type="submit" class="btn" style="background: rgba(207, 69, 69, 0.1); color: var(--danger); padding: 5px 12px;">
-                                    <i data-lucide="trash-2" style="width: 14px;"></i>
-                                </button>
-                            </form>
-                        </div>
+                        <?php if ($_can_manage): ?>
+                            <div style="display: flex; gap: 5px;">
+                                <a href="edit.php?nis=<?= $row['nis'] ?>" class="btn" style="background: rgba(150, 126, 118, 0.1); color: var(--mocha); padding: 5px 12px;">
+                                    <i data-lucide="edit-3" style="width: 14px;"></i>
+                                </a>
+                                <form action="<?= BASE_URL ?>/process/siswa_process.php" method="post" onsubmit="return confirm('Hapus <?= $row['nama_siswa'] ?>?')">
+                                    <input type="hidden" name="nis" value="<?= $row['nis'] ?>">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button type="submit" class="btn" style="background: rgba(207, 69, 69, 0.1); color: var(--danger); padding: 5px 12px;">
+                                        <i data-lucide="trash-2" style="width: 14px;"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        <?php else: ?>
+                            <span style="color: #888;">Read-only</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endwhile; ?>
@@ -122,11 +130,15 @@ $result_nonaktif = mysqli_query($conn, "
                     <td><span class="badge" style="background: #eee; color: #888;"><?= htmlspecialchars($row['status']) ?></span></td>
                     <td><?= htmlspecialchars($row['tingkat'].' '.$row['program_keahlian'].' '.$row['rombel']) ?></td>
                     <td>
-                        <div style="display: flex; gap: 5px;">
-                            <a href="edit.php?nis=<?= $row['nis'] ?>" class="btn" style="background: #eee; color: #888; padding: 5px 12px;">
-                                <i data-lucide="edit-2" style="width: 14px;"></i>
-                            </a>
-                        </div>
+                        <?php if ($_can_manage): ?>
+                            <div style="display: flex; gap: 5px;">
+                                <a href="edit.php?nis=<?= $row['nis'] ?>" class="btn" style="background: #eee; color: #888; padding: 5px 12px;">
+                                    <i data-lucide="edit-2" style="width: 14px;"></i>
+                                </a>
+                            </div>
+                        <?php else: ?>
+                            <span style="color: #888;">Read-only</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endwhile; ?>

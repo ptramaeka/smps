@@ -6,6 +6,10 @@ include_once __DIR__ . '/../../config/config.php';
 // Menghubungkan ke file konfigurasi (koneksi database)
 // Menyertakan file header (biasanya berisi tampilan atas halaman dan koneksi dasar)
 include ROOT_PATH . "/includes/header.php";
+
+if (!smps_can_manage_data()) {
+    smps_deny_access('Akses ditolak. Hanya admin yang dapat menambah data.', BASE_URL . '/pages/guru/list.php');
+}
 ?>
 
 <!-- Membuat tampilan form untuk menambah data guru -->
@@ -64,8 +68,9 @@ include ROOT_PATH . "/includes/header.php";
                     <td>
                         <select name="role" id="" style="width: 100%;">
                             <option value="">Pilih Role</option>
-                            <option value="guru">Guru</option>
+                            <option value="admin">Admin</option>
                             <option value="bk">BK</option>
+                            <option value="pengajar">Pengajar</option>
                         </select>
                     </td>
                 </tr>

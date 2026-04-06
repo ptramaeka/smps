@@ -2,6 +2,8 @@
 include_once __DIR__ . '/../../config/config.php';
 include ROOT_PATH . "/includes/header.php";
 
+$_can_manage = smps_can_manage_data();
+
 // Mengambil semua data kelas dari tabel 'kelas' 
 $result = mysqli_query($conn, "SELECT kelas.id_kelas, tingkat.tingkat, program_keahlian.program_keahlian, kelas.rombel, guru.nama_pengguna FROM kelas JOIN tingkat ON kelas.id_tingkat = tingkat.id_tingkat JOIN program_keahlian ON kelas.id_program_keahlian = program_keahlian.id_program_keahlian LEFT JOIN guru ON kelas.kode_guru = guru.kode_guru ORDER BY kelas.id_tingkat DESC, kelas.id_program_keahlian ASC, kelas.rombel ASC");
 ?>
@@ -10,11 +12,13 @@ $result = mysqli_query($conn, "SELECT kelas.id_kelas, tingkat.tingkat, program_k
     <div>
         <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--mocha);">Data Kelas</h2>
         <p style="color: #888;">Kelola rombongan belajar dan penempatan wali kelas.</p>
-    </div>
-    <a href="add.php" class="btn btn-primary">
-        <i data-lucide="plus" style="width: 18px; vertical-align: middle; margin-right: 5px;"></i>
-        Tambah Kelas
-    </a>
+</div>
+    <?php if ($_can_manage): ?>
+        <a href="add.php" class="btn btn-primary">
+            <i data-lucide="plus" style="width: 18px; vertical-align: middle; margin-right: 5px;"></i>
+            Tambah Kelas
+        </a>
+    <?php endif; ?>
 </div>
 
 <div class="glass-card">
@@ -54,24 +58,28 @@ $result = mysqli_query($conn, "SELECT kelas.id_kelas, tingkat.tingkat, program_k
                         </span>
                     </td>
                     <td>
-                        <div style="display: flex; gap: 5px;">
-                            <a href="edit.php?id=<?= $row['id_kelas'] ?>" class="btn" style="background: rgba(150, 126, 118, 0.1); color: var(--mocha); padding: 5px 12px;">
-                                <i data-lucide="edit-3" style="width: 14px;"></i>
-                            </a>
-                            <?php
-                            $cek_siswa = mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa WHERE id_kelas = '" . $row['id_kelas'] . "'");
-                            $data_siswa = mysqli_fetch_assoc($cek_siswa);
-                            
-                            if ($data_siswa['total'] == 0): ?>
-                            <form action="<?= BASE_URL ?>/process/kelas_process.php" method="post" onsubmit="return confirm('Hapus kelas?')">
-                                <input type="hidden" name="id_kelas" value="<?= $row['id_kelas'] ?>">
-                                <input type="hidden" name="action" value="delete">
-                                <button type="submit" class="btn" style="background: rgba(207, 69, 69, 0.1); color: var(--danger); padding: 5px 12px;">
-                                    <i data-lucide="trash-2" style="width: 14px;"></i>
-                                </button>
-                            </form>
-                            <?php endif; ?>
-                        </div>
+                        <?php if ($_can_manage): ?>
+                            <div style="display: flex; gap: 5px;">
+                                <a href="edit.php?id=<?= $row['id_kelas'] ?>" class="btn" style="background: rgba(150, 126, 118, 0.1); color: var(--mocha); padding: 5px 12px;">
+                                    <i data-lucide="edit-3" style="width: 14px;"></i>
+                                </a>
+                                <?php
+                                $cek_siswa = mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa WHERE id_kelas = '" . $row['id_kelas'] . "'");
+                                $data_siswa = mysqli_fetch_assoc($cek_siswa);
+                                
+                                if ($data_siswa['total'] == 0): ?>
+                                <form action="<?= BASE_URL ?>/process/kelas_process.php" method="post" onsubmit="return confirm('Hapus kelas?')">
+                                    <input type="hidden" name="id_kelas" value="<?= $row['id_kelas'] ?>">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button type="submit" class="btn" style="background: rgba(207, 69, 69, 0.1); color: var(--danger); padding: 5px 12px;">
+                                        <i data-lucide="trash-2" style="width: 14px;"></i>
+                                    </button>
+                                </form>
+                                <?php endif; ?>
+                            </div>
+                        <?php else: ?>
+                            <span style="color: #888;">Read-only</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endwhile; ?>

@@ -7,6 +7,10 @@ include_once __DIR__ . '/../../config/config.php';
 // Menyertakan tampilan header (bagian atas halaman)
 include ROOT_PATH . "/includes/header.php";
 
+smps_require_roles(['admin', 'bk', 'pengajar'], 'Akses ditolak. Halaman laporan hanya untuk admin/BK/pengajar.');
+
+$_can_print = smps_can_print_reports();
+
 // jika ada(isset) tombol ditekan dengan method GET berisi value cari maka jalankan perintah dalam if
 if(isset($_GET['cari'])){
     $cari = $_GET['cari'];
@@ -22,21 +26,23 @@ if(isset($_GET['cari'])){
 
 <center>
     <!-- Tombol cetak langsung surat pindah sekolah / manual -->
-    <button class="print-btn" onclick="window.location.href='<?= BASE_URL ?>/pages/cetak/add_pindah_sekolah.php'">
-        <!-- icon printer (gambar mesin pencetak) -->
-        <span class="printer-wrapper">
-            <span class="printer-container">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 92 75">
-                    <path stroke-width="5" stroke="black" d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z"></path>
-                    <mask fill="white" id="path-2-inside-1_30_7"><path d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z"></path></mask>
-                    <path mask="url(#path-2-inside-1_30_7)" fill="black" d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z"></path>
-                    <circle fill="black" r="3" cy="49" cx="78"></circle>
-                </svg>
+    <?php if ($_can_print): ?>
+        <button class="print-btn" onclick="window.location.href='<?= BASE_URL ?>/pages/cetak/add_pindah_sekolah.php'">
+            <!-- icon printer (gambar mesin pencetak) -->
+            <span class="printer-wrapper">
+                <span class="printer-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 92 75">
+                        <path stroke-width="5" stroke="black" d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z"></path>
+                        <mask fill="white" id="path-2-inside-1_30_7"><path d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z"></path></mask>
+                        <path mask="url(#path-2-inside-1_30_7)" fill="black" d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z"></path>
+                        <circle fill="black" r="3" cy="49" cx="78"></circle>
+                    </svg>
+                </span>
+                <span class="printer-page-wrapper"><span class="printer-page"></span></span>
             </span>
-            <span class="printer-page-wrapper"><span class="printer-page"></span></span>
-        </span>
-        &nbsp;&nbsp;Cetak Surat Pindah Sekolah
-    </button><br>
+            &nbsp;&nbsp;Cetak Surat Pindah Sekolah
+        </button><br>
+    <?php endif; ?>
     
     <fieldset style="width: 70%;">
         <legend>Daftar Surat Pindah</legend>
@@ -119,7 +125,11 @@ if(isset($_GET['cari'])){
                         <td><?= htmlspecialchars($row['alasan_pindah']) ?></td>
                         <td>
                             <!-- tombol untuk menampilkan detail pelanggaran dengan mengirim nis terpilih melalui method GET -->
-                            <button class="btn-primary"><a href="<?= BASE_URL ?>/pages/cetak/surat_pindah_sekolah.php?no_surat=<?=$row['no_surat']?>">Cetak</a></button>
+                            <?php if ($_can_print): ?>
+                                <button class="btn-primary"><a href="<?= BASE_URL ?>/pages/cetak/surat_pindah_sekolah.php?no_surat=<?=$row['no_surat']?>">Cetak</a></button>
+                            <?php else: ?>
+                                <span style="color: #888;">Read-only</span>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php

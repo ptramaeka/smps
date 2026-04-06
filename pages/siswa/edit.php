@@ -1,5 +1,12 @@
 <?php
 include_once __DIR__ . '/../../config/config.php';
+
+include ROOT_PATH . "/includes/header.php";
+
+if (!smps_can_manage_data()) {
+    smps_deny_access('Akses ditolak. Hanya admin yang dapat mengubah data.', BASE_URL . '/pages/siswa/list.php');
+}
+
 $query = "
 SELECT siswa.*, ortu_wali.*, kelas.*, program_keahlian.*, tingkat.*, guru.nama_pengguna 
 FROM siswa

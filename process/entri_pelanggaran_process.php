@@ -3,6 +3,9 @@ include_once __DIR__ . '/../config/config.php';
 // Menentukan path utama proyek agar mudah memanggil file lain
 include_once __DIR__ . "/../config/config.php";
 
+smps_require_login();
+smps_require_roles(['admin', 'bk'], 'Akses ditolak. Hanya admin dan BK yang dapat menambah pelanggaran.');
+
 // Mengecek apakah permintaan berasal dari metode POST (bukan GET)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -26,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         // Eksekusi query
         if (mysqli_query($conn, $query_pelanggaran)) {
-            echo "<script>alert('Entri berhasil ditambahkan!'); window.location.href='<?= BASE_URL ?>/pages/entri_pelanggaran/LIST.PHP';</script>";
+            echo "<script>alert('Entri berhasil ditambahkan!'); window.location.href='" . BASE_URL . "/pages/laporan/detail_pelanggaran.php?nis=" . urlencode($nis) . "';</script>";
         } else {
             echo "<script>alert('Gagal menambahkan entri!'); window.history.back();</script>";
         }

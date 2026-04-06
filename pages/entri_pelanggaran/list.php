@@ -1,6 +1,8 @@
 <?php
 include_once __DIR__ . '/../../config/config.php';
 include ROOT_PATH . "/includes/header.php";
+
+$_can_add_violation = smps_can_add_violation();
 ?>
 
 <div style="max-width: 800px; margin: 0 auto;">
@@ -51,10 +53,14 @@ include ROOT_PATH . "/includes/header.php";
             </div>
 
             <div style="text-align: right;">
-                <button type="submit" class="btn btn-primary" style="padding: 12px 40px; font-size: 1rem; display: inline-flex; align-items: center; gap: 10px;">
-                    Simpan Pelanggaran
-                    <i data-lucide="save" style="width: 18px;"></i>
-                </button>
+                <?php if ($_can_add_violation): ?>
+                    <button type="submit" class="btn btn-primary" style="padding: 12px 40px; font-size: 1rem; display: inline-flex; align-items: center; gap: 10px;">
+                        Simpan Pelanggaran
+                        <i data-lucide="save" style="width: 18px;"></i>
+                    </button>
+                <?php else: ?>
+                    <span style="color: #888;">Hanya admin/BK yang dapat menambah pelanggaran.</span>
+                <?php endif; ?>
             </div>
         </form>
     </div>

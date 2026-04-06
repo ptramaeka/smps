@@ -1,5 +1,5 @@
 <?php
-$dir = "C:/xampp/htdocs/Poin_Pelanggaran_Siswa";
+$dir = "C:/xampp/htdocs/smps";
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
 
 foreach ($iterator as $file) {
@@ -9,10 +9,10 @@ foreach ($iterator as $file) {
         $newContent = $content;
 
         // 1. Fix messy lines (previous failed replacements)
-        $newContent = preg_replace("/include_once __DIR__ \. '[^']+';, \$_SERVER\['DOCUMENT_ROOT'\] \. '\/Poin_Pelanggaran_Siswa'\);/", "", $newContent);
+        $newContent = preg_replace("/include_once __DIR__ \. '[^']+';, \$_SERVER\['DOCUMENT_ROOT'\] \. '\/smps'\);/", "", $newContent);
         
         // 2. Remove old defines (ROOTPATH or ROOT_PATH)
-        $newContent = preg_replace("/define\('(ROOTPATH|ROOT_PATH)', \$_SERVER\['DOCUMENT_ROOT'\] \. '\/Poin_Pelanggaran_Siswa'\);\s*/", "", $newContent);
+        $newContent = preg_replace("/define\('(ROOTPATH|ROOT_PATH)', \$_SERVER\['DOCUMENT_ROOT'\] \. '\/smps'\);\s*/", "", $newContent);
         
         // 3. Remove redundant config includes
         $newContent = preg_replace("/include (ROOTPATH|ROOT_PATH) \. \"\/config\/config\.php\";\s*/", "", $newContent);
@@ -42,7 +42,7 @@ foreach ($iterator as $file) {
         $newContent = str_replace("ROOTPATH", "ROOT_PATH", $newContent);
         
         // 8. Replace hardcoded project URL in form actions
-        $newContent = str_replace('action="/Poin_Pelanggaran_Siswa/', 'action="<?= BASE_URL ?>/', $newContent);
+        $newContent = str_replace('action="/smps/', 'action="<?= BASE_URL ?>/', $newContent);
 
         // 9. Clean up multiple open tags and newlines
         $newContent = preg_replace("/^<\?php\s+<\?php/m", "<?php", $newContent);

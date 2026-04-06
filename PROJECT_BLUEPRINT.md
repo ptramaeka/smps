@@ -379,3 +379,171 @@ Ringkasan: Menambahkan redirect awal ke halaman login jika user belum login.
 Alasan: Agar akses pertama dari browser selalu diarahkan ke login saat belum terautentikasi.
 File diubah:
 * `index.php`
+
+### 2026-04-07
+Ringkasan: Menstandarkan role menjadi `admin`, `siswa`, `bk`, `pengajar` dan menambahkan guard akses untuk mencegah perubahan data oleh role non-admin.
+Alasan: Menyesuaikan aturan akses sesuai kebutuhan sekolah dan membatasi aksi perubahan data.
+File diubah:
+* `config/config.php`
+* `includes/header.php`
+* `pages/guru/add.php`
+* `pages/guru/edit.php`
+* `process/entri_pelanggaran_process.php`
+* `process/guru_process.php`
+* `process/jenis_pelanggaran_process.php`
+* `process/kelas_process.php`
+* `process/login_process.php`
+* `process/siswa_process.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan tabel `roles` dan relasi FK ke tabel `guru` dan `siswa`.
+Alasan: Menyimpan role secara terpusat dan terstruktur.
+File diubah:
+* `database/001_roles.sql`
+
+### 2026-04-07
+Ringkasan: Mengubah login dan proses guru agar menggunakan relasi `roles` (role_id) sebagai sumber role.
+Alasan: Menyelaraskan aplikasi dengan tabel role terpusat.
+File diubah:
+* `process/login_process.php`
+* `process/guru_process.php`
+
+### 2026-04-07
+Ringkasan: Menampilkan role guru berdasarkan tabel `roles` pada daftar guru.
+Alasan: Konsistensi tampilan role sesuai sumber terpusat.
+File diubah:
+* `pages/guru/list.php`
+
+### 2026-04-07
+Ringkasan: Mengisi `role_id` guru yang kosong dan mengunci `role_id` menjadi NOT NULL pada tabel `guru` dan `siswa`.
+Alasan: Menjamin seluruh data memiliki relasi role yang valid.
+File diubah:
+* (eksekusi SQL langsung pada database)
+
+### 2026-04-07
+Ringkasan: Menambahkan kontrol UI read-only untuk role non-admin dan menampilkan role dari tabel `roles` pada form edit guru.
+Alasan: Menyelaraskan tampilan dengan akses role dan mencegah aksi edit/hapus untuk pengajar/BK.
+File diubah:
+* `config/config.php`
+* `pages/entri_pelanggaran/list.php`
+* `pages/guru/edit.php`
+* `pages/guru/list.php`
+* `pages/jenis_pelanggaran/list.php`
+* `pages/kelas/list.php`
+* `pages/siswa/list.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan guard di halaman add/edit untuk admin-only dan membatasi tombol cetak laporan untuk admin/BK.
+Alasan: Memastikan akses UI konsisten dengan aturan role.
+File diubah:
+* `pages/guru/add.php`
+* `pages/guru/edit.php`
+* `pages/siswa/add.php`
+* `pages/siswa/edit.php`
+* `pages/kelas/add.php`
+* `pages/kelas/edit.php`
+* `pages/jenis_pelanggaran/add.php`
+* `pages/jenis_pelanggaran/edit.php`
+* `pages/laporan/detail_pelanggaran.php`
+* `pages/laporan/laporan_panggilan_ortu.php`
+* `pages/laporan/laporan_perjanjian.php`
+* `pages/laporan/laporan_pindah.php`
+* `pages/laporan/laporan_rekaptulasi.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan guard admin/BK pada seluruh halaman cetak agar tidak bisa diakses langsung via URL oleh role lain.
+Alasan: Menutup akses langsung ke fitur cetak.
+File diubah:
+* `pages/cetak/add_panggilan_ortu.php`
+* `pages/cetak/add_perjanjian_ortu.php`
+* `pages/cetak/add_perjanjian_siswa.php`
+* `pages/cetak/add_pindah_sekolah.php`
+* `pages/cetak/surat_panggilan_ortu.php`
+* `pages/cetak/surat_perjanjian_ortu.php`
+* `pages/cetak/surat_perjanjian_siswa.php`
+* `pages/cetak/surat_pindah_sekolah.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan guard laporan agar hanya admin/BK/pengajar yang bisa mengakses; siswa ditolak.
+Alasan: Menyesuaikan akses laporan sesuai aturan role.
+File diubah:
+* `pages/laporan/detail_pelanggaran.php`
+* `pages/laporan/laporan_panggilan_ortu.php`
+* `pages/laporan/laporan_perjanjian.php`
+* `pages/laporan/laporan_pindah.php`
+* `pages/laporan/laporan_rekaptulasi.php`
+* `pages/laporan/pelanggaran_siswa.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan redirect khusus siswa ke dashboard saat mencoba akses URL selain dashboard.
+Alasan: Membatasi akses siswa ke halaman laporan/cetak/CRUD.
+File diubah:
+* `includes/header.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan dashboard ringkas untuk siswa dan redirect admin-only ke halaman list terkait.
+Alasan: Menyesuaikan pengalaman siswa dan konsistensi akses role.
+File diubah:
+* `pages/dashboard.php`
+* `pages/guru/add.php`
+* `pages/guru/edit.php`
+* `pages/siswa/add.php`
+* `pages/siswa/edit.php`
+* `pages/kelas/add.php`
+* `pages/kelas/edit.php`
+* `pages/jenis_pelanggaran/add.php`
+* `pages/jenis_pelanggaran/edit.php`
+
+### 2026-04-07
+Ringkasan: Menyembunyikan menu navigasi yang tidak diizinkan berdasarkan role.
+Alasan: Menjaga konsistensi akses UI sesuai role.
+File diubah:
+* `includes/header.php`
+
+### 2026-04-07
+Ringkasan: Menyembunyikan menu `Data Guru` untuk role non-admin.
+Alasan: Hanya admin yang boleh melihat data guru.
+File diubah:
+* `includes/header.php`
+
+### 2026-04-07
+Ringkasan: Memperbarui UI/UX halaman login agar lebih modern dan sesuai nuansa pendidikan.
+Alasan: Meningkatkan kenyamanan dan kejelasan saat login.
+File diubah:
+* `login.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan tombol "lihat password" pada halaman login.
+Alasan: Meningkatkan UX saat pengguna mengetik password.
+File diubah:
+* `login.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan ikon mata dan validasi ringan pada form login.
+Alasan: Membuat UX login lebih familiar dan jelas saat input kosong.
+File diubah:
+* `login.php`
+
+### 2026-04-07
+Ringkasan: Mengarahkan user ke detail pelanggaran setelah berhasil menambah pelanggaran siswa.
+Alasan: Memudahkan verifikasi hasil input pelanggaran.
+File diubah:
+* `process/entri_pelanggaran_process.php`
+
+### 2026-04-07
+Ringkasan: Menambahkan tombol "Kembali ke Entri" pada halaman detail pelanggaran.
+Alasan: Mempercepat input pelanggaran berikutnya.
+File diubah:
+* `pages/laporan/detail_pelanggaran.php`
+
+### 2026-04-07
+Ringkasan: Memperbarui UI detail pelanggaran agar lebih informatif dan rapi.
+Alasan: Menampilkan identitas, ringkasan, dan detail pelanggaran secara relevan.
+File diubah:
+* `pages/laporan/detail_pelanggaran.php`
+
+### 2026-04-07
+Ringkasan: Menyesuaikan UI detail pelanggaran agar menyerupai tampilan PDF/screenshot.
+Alasan: Konsistensi tampilan laporan dengan format resmi sekolah.
+File diubah:
+* `pages/laporan/detail_pelanggaran.php`

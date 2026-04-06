@@ -2,6 +2,9 @@
 include_once __DIR__ . '/../../config/config.php';
 // Menentukan lokasi root folder proyek di server
 
+smps_require_login();
+smps_require_roles(['admin', 'bk'], 'Akses ditolak. Halaman cetak hanya untuk admin/BK.');
+
 
 // Menghubungkan ke file konfigurasi (koneksi database)
 // Menyertakan tampilan header (bagian atas halaman)

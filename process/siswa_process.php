@@ -3,6 +3,9 @@ include_once __DIR__ . '/../config/config.php';
 // Menentukan path utama proyek agar mudah memanggil file lain
 include_once __DIR__ . "/../config/config.php";
 
+smps_require_login();
+smps_require_roles(['admin'], 'Akses ditolak. Hanya admin yang dapat mengelola data siswa.');
+
 // Mengecek apakah permintaan berasal dari metode POST (bukan GET)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -75,9 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         mysqli_query($conn, $query);
 
         if($query){
-            echo "<script>alert('Berhasil Menambah Data Siswa'); window.location.href = '/Poin_Pelanggaran_Siswa_XIIRPL4/pages/siswa/list.php';</script>";
+            echo "<script>alert('Berhasil Menambah Data Siswa'); window.location.href = '/smps_XIIRPL4/pages/siswa/list.php';</script>";
         }else{
-            echo "<script>alert('Gagal Menambah Data Siswa'); window.location.href = '/Poin_Pelanggaran_Siswa_XIIRPL4/pages/siswa/add.php';</script>";
+            echo "<script>alert('Gagal Menambah Data Siswa'); window.location.href = '/smps_XIIRPL4/pages/siswa/add.php';</script>";
         }
     // Jika aksi adalah "edit", maka ubah data siswa berdasarkan NIS
     } elseif ($action == 'edit') {

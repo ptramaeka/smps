@@ -1,6 +1,9 @@
 <?php
 include_once __DIR__ . '/../../config/config.php';
 
+smps_require_login();
+smps_require_roles(['admin', 'bk'], 'Akses ditolak. Halaman cetak hanya untuk admin/BK.');
+
 include ROOT_PATH . "/includes/header.php";
 ?>
 

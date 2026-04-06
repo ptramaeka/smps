@@ -1,5 +1,5 @@
 <?php
-$dir = realpath("C:/xampp/htdocs/Poin_Pelanggaran_Siswa");
+$dir = realpath("C:/xampp/htdocs/smps");
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
 
 foreach ($iterator as $file) {
@@ -7,7 +7,7 @@ foreach ($iterator as $file) {
         $path = $file->getRealPath();
         $content = file_get_contents($path);
         
-        $newContent = str_replace('/Poin_Pelanggaran_Siswa/', '<?= BASE_URL ?>/', $content);
+        $newContent = str_replace('/smps/', '<?= BASE_URL ?>/', $content);
         $newContent = str_replace('<?= BASE_URL ?><?= BASE_URL ?>', '<?= BASE_URL ?>', $newContent);
         
         if (basename($path) === 'header.php') {

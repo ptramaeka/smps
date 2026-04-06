@@ -1,5 +1,5 @@
 <?php
-$dir = "C:/xampp/htdocs/Poin_Pelanggaran_Siswa";
+$dir = "C:/xampp/htdocs/smps";
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
 
 foreach ($iterator as $file) {
@@ -8,7 +8,7 @@ foreach ($iterator as $file) {
         $content = file_get_contents($path);
         
         // Remove the specific messy fragment
-        $search = ", \$_SERVER['DOCUMENT_ROOT'] . '/Poin_Pelanggaran_Siswa');";
+        $search = ", \$_SERVER['DOCUMENT_ROOT'] . '/smps');";
         if (strpos($content, $search) !== false) {
             $newContent = str_replace($search, "", $content);
             file_put_contents($path, $newContent);

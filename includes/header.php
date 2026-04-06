@@ -1,40 +1,43 @@
 <?php
 // Cek autentikasi dasar
-if(!isset($_COOKIE['username']) || !isset($_COOKIE['role'])){
-    echo "<script>alert('Anda belum login');window.location.href='" . BASE_URL . "/login.php';</script>";
-    exit;
-}
+smps_require_login();
 
-$role = $_COOKIE['role'];
+$role = smps_get_role();
 $current_url = $_SERVER['PHP_SELF'];
+
+$can_view_data = ($role !== 'siswa');
+$can_view_data_guru = ($role === 'admin');
+$can_view_reports = in_array($role, ['admin', 'bk', 'pengajar'], true);
+$can_view_entry = ($role !== 'siswa');
+
+// Validasi role yang dikenal
+$known_roles = ['admin', 'siswa', 'bk', 'pengajar'];
+if (!in_array($role, $known_roles, true)) {
+    smps_deny_access('Role tidak dikenali.', BASE_URL . '/login.php');
+}
 
 // SISTEM PENCEGAHAN AKSES HALAMAN BERDASARKAN ROLE
 // Tentukan path/folder URL apa saja yang tidak boleh diakses oleh masing-masing role
-$restricted_pages = [
+$allowlist_pages = [
+    // Siswa hanya boleh melihat dashboard
     'siswa' => [
-        '/pages/guru/',
-        '/pages/siswa/',
-        '/pages/jenis_pelanggaran/',
-        '/pages/kelas/',
-        '/pages/entri_pelanggaran/',
-        '/pages/laporan/',
-        '/pages/edit_profil/'
-    ],
-    // Contoh untuk guru, Anda bisa sesuaikan dengan rule Anda
-    'guru' => [
-        '/pages/guru/', // Misal guru tidak boleh mengelola data guru
-        '/pages/edit_profil/' // Misal ini khusus untuk admin/manajemen user
+        '/pages/dashboard.php'
     ]
-    // role 'admin' bebas mengakses semuanya sehingga tidak dimasukkan ke dalam batasan
 ];
 
-// Lakukan pengecekan server-side
-if (isset($restricted_pages[$role])) {
-    foreach ($restricted_pages[$role] as $restricted) {
-        // Jika current url mengandung string dari daftar yang dilarang
-        if (strpos($current_url, $restricted) !== false) {
-            echo "<script>alert('Akses Ditolak: Role ($role) tidak memiliki izin untuk halaman ini!');window.history.back();</script>";
-            exit;
+if (isset($allowlist_pages[$role])) {
+    $is_allowed = false;
+    foreach ($allowlist_pages[$role] as $allowed) {
+        if (strpos($current_url, $allowed) !== false) {
+            $is_allowed = true;
+            break;
+        }
+    }
+    if (!$is_allowed) {
+        if ($role === 'siswa') {
+            smps_deny_access("Akses Ditolak: Role ($role) hanya dapat mengakses dashboard.", BASE_URL . '/pages/dashboard.php');
+        } else {
+            smps_deny_access("Akses Ditolak: Role ($role) tidak memiliki izin untuk halaman ini!");
         }
     }
 }
@@ -79,18 +82,25 @@ if (isset($restricted_pages[$role])) {
             <ul>
                 <li><a href="<?= BASE_URL ?>/pages/dashboard.php">Dashboard</a></li>
                 
+                <?php if ($can_view_data): ?>
                 <li class="dropdown">
                     <a href="#">Data <i data-lucide="chevron-down" style="width: 14px; display: inline-block; vertical-align: middle;"></i></a>
                     <div class="dropdown-content">
+                        <?php if ($can_view_data_guru): ?>
                         <a href="<?= BASE_URL ?>/pages/guru/list.php">Data Guru</a>
+                        <?php endif; ?>
                         <a href="<?= BASE_URL ?>/pages/kelas/list.php">Data Kelas</a>
                         <a href="<?= BASE_URL ?>/pages/siswa/list.php">Data Siswa</a>
                         <a href="<?= BASE_URL ?>/pages/jenis_pelanggaran/list.php">Jenis Pelanggaran</a>
                     </div>
                 </li>
+                <?php endif; ?>
                 
+                <?php if ($can_view_entry): ?>
                 <li><a href="<?= BASE_URL ?>/pages/entri_pelanggaran/list.php">Entri Pelanggaran</a></li>
+                <?php endif; ?>
                 
+                <?php if ($can_view_reports): ?>
                 <li class="dropdown">
                     <a href="#">Laporan <i data-lucide="chevron-down" style="width: 14px; display: inline-block; vertical-align: middle;"></i></a>
                     <div class="dropdown-content">
@@ -101,11 +111,12 @@ if (isset($restricted_pages[$role])) {
                         <a href="<?= BASE_URL ?>/pages/laporan/laporan_rekaptulasi.php">Rekapitulasi</a>
                     </div>
                 </li>
+                <?php endif; ?>
                 <li class="dropdown dropdown-right">
                     <a href="#" style="background: var(--mocha); color: white; padding: 10px 20px;">
                         <i data-lucide="user" style="width: 16px; margin-right: 5px;"></i>
-                        <?= $_COOKIE['nama'] ?>
-                        <span class="badge badge-role" style="margin-left: 8px;"><?= $_COOKIE['role'] ?></span>
+                        <?= htmlspecialchars($_COOKIE['nama']) ?>
+                        <span class="badge badge-role" style="margin-left: 8px;"><?= htmlspecialchars($role) ?></span>
                     </a>
                     <div class="dropdown-content">
                         <a href="#" onclick="alert('Fitur Edit Profil akan segera hadir!')"><i data-lucide="settings" style="width: 14px;"></i> Edit Profil</a>

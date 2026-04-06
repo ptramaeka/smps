@@ -3,6 +3,9 @@ include_once __DIR__ . '/../config/config.php';
 // Menentukan path utama proyek agar mudah memanggil file lain
 include_once __DIR__ . "/../config/config.php";
 
+smps_require_login();
+smps_require_roles(['admin'], 'Akses ditolak. Hanya admin yang dapat mengelola jenis pelanggaran.');
+
 // Mengecek apakah permintaan berasal dari metode POST (bukan GET)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 

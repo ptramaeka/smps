@@ -7,9 +7,18 @@ include_once __DIR__ . '/../../config/config.php';
 // Menyertakan file header (biasanya berisi tampilan atas halaman dan koneksi dasar)
 include ROOT_PATH . "/includes/header.php";
 
+if (!smps_can_manage_data()) {
+    smps_deny_access('Akses ditolak. Hanya admin yang dapat mengubah data.', BASE_URL . '/pages/guru/list.php');
+}
+
 // Mengambil data guru
 $kode_guru = $_GET["kode_guru"];
-$result = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM guru WHERE kode_guru = $kode_guru"));
+$result = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT g.*, COALESCE(r.name, g.role) AS role_name
+    FROM guru g
+    LEFT JOIN roles r ON r.id = g.role_id
+    WHERE g.kode_guru = $kode_guru
+"));
 ?>
 
 <!-- Membuat tampilan form untuk menambah data guru -->
@@ -44,8 +53,9 @@ $result = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM guru WHERE kode_
                 <tr>
                     <td>
                         <select name="role" id="" style="width: 100%;">
-                            <option <?php if($result['role'] == 'guru'){ echo "selected"; } ?> value="guru">Guru</option>
-                            <option <?php if($result['role'] == 'bk'){ echo "selected"; } ?> value="bk">BK</option>
+                            <option <?php if($result['role_name'] == 'admin'){ echo "selected"; } ?> value="admin">Admin</option>
+                            <option <?php if($result['role_name'] == 'bk'){ echo "selected"; } ?> value="bk">BK</option>
+                            <option <?php if($result['role_name'] == 'pengajar' || $result['role_name'] == 'guru'){ echo "selected"; } ?> value="pengajar">Pengajar</option>
                         </select>
                     </td>
                 </tr>

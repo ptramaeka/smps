@@ -3,6 +3,9 @@ include_once __DIR__ . '/../config/config.php';
 // Menentukan path utama proyek agar mudah memanggil file lain
 include_once __DIR__ . "/../config/config.php";
 
+smps_require_login();
+smps_require_roles(['admin'], 'Akses ditolak. Hanya admin yang dapat mengelola data guru.');
+
 // Mengecek apakah permintaan berasal dari metode POST (bukan GET)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -17,8 +20,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $telp = $_POST['telp'];
         $password_input = password_hash("Guru12345*!", PASSWORD_DEFAULT);
         $role = $_POST["role"];
+        if ($role === 'guru') {
+            $role = 'pengajar';
+        }
+
+        $role_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT id FROM roles WHERE name = '$role'"));
+        if (!$role_row) {
+            echo "Role tidak valid.";
+            exit;
+        }
+        $role_id = $role_row['id'];
         
-        $query = mysqli_query($conn, "INSERT INTO guru (kode_guru, nama_pengguna, role, username, password, aktif, jabatan, telp) VALUES ('$kode_guru', '$nama_guru', '$role', '$username', '$password_input', 'Y', '$jabatan', '$telp')");
+        $query = mysqli_query($conn, "INSERT INTO guru (kode_guru, nama_pengguna, role, role_id, username, password, aktif, jabatan, telp) VALUES ('$kode_guru', '$nama_guru', '$role', '$role_id', '$username', '$password_input', 'Y', '$jabatan', '$telp')");
         if($query){
             header("Location: ../pages/guru/list.php");
         }else{
@@ -31,7 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $jabatan = $_POST['jabatan'];
         $telp = $_POST['telp'];
         $role = $_POST['role'];
+        if ($role === 'guru') {
+            $role = 'pengajar';
+        }
         $aktif = $_POST['aktif'];
+
+        $role_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT id FROM roles WHERE name = '$role'"));
+        if (!$role_row) {
+            echo "Role tidak valid.";
+            exit;
+        }
+        $role_id = $role_row['id'];
 
         // ========================
         // 1. Update tabel guru
@@ -41,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             jabatan = '$jabatan',
             telp = '$telp',
             role = '$role',
+            role_id = '$role_id',
             aktif = '$aktif'
             WHERE kode_guru = '$kode_guru'
         ";
@@ -54,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 jabatan = '$jabatan',
                 telp = '$telp',
                 role = '$role',
+                role_id = '$role_id',
                 aktif = '$aktif'
                 WHERE kode_guru = '$kode_guru'
             ";

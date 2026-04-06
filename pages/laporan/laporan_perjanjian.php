@@ -340,6 +340,10 @@ $hasil_laporan_perjanjian_ortu = mysqli_query($conn, $sql_laporan_perjanjian_ort
 
 // Langkah terakhir sebelum HTML: pasang header/tampilan atas halaman
 include ROOT_PATH . "/includes/header.php";
+
+smps_require_roles(['admin', 'bk', 'pengajar'], 'Akses ditolak. Halaman laporan hanya untuk admin/BK/pengajar.');
+
+$_can_print = smps_can_print_reports();
 ?>
 
 
@@ -367,10 +371,12 @@ $ikon_printer = '
 <center>
 
     <!-- Tombol untuk langsung mencetak surat perjanjian siswa baru -->
-    <button class="print-btn" onclick="window.location.href='<?= BASE_URL ?>/pages/cetak/add_perjanjian_siswa.php'">
-        <?= $ikon_printer ?>
-        &nbsp;&nbsp;Cetak Surat Perjanjian Siswa
-    </button><br>
+    <?php if ($_can_print): ?>
+        <button class="print-btn" onclick="window.location.href='<?= BASE_URL ?>/pages/cetak/add_perjanjian_siswa.php'">
+            <?= $ikon_printer ?>
+            &nbsp;&nbsp;Cetak Surat Perjanjian Siswa
+        </button><br>
+    <?php endif; ?>
 
     <fieldset style="width: 80%;">
         <legend>Daftar Pelanggaran Per Siswa</legend>
@@ -469,10 +475,14 @@ $ikon_printer = '
                                 </button>
                                 <hr>
                                 <!-- Form untuk mencetak surat perjanjian baru -->
-                                <form action="<?= BASE_URL ?>/pages/cetak/add_perjanjian_siswa.php" method="post">
-                                    <input type="hidden" name="nis" value="<?= $data_siswa['nis'] ?>">
-                                    <input type="submit" value="Cetak" style="padding:10px 15px;font-weight:bold;background-color:#fff;border-radius:5px;border:1px solid #ccc;">
-                                </form>
+                                <?php if ($_can_print): ?>
+                                    <form action="<?= BASE_URL ?>/pages/cetak/add_perjanjian_siswa.php" method="post">
+                                        <input type="hidden" name="nis" value="<?= $data_siswa['nis'] ?>">
+                                        <input type="submit" value="Cetak" style="padding:10px 15px;font-weight:bold;background-color:#fff;border-radius:5px;border:1px solid #ccc;">
+                                    </form>
+                                <?php else: ?>
+                                    <span style="color: #888;">Read-only</span>
+                                <?php endif; ?>
 
                             <?php } elseif ($data_siswa['status_dokumen'] == "Masih Proses") { ?>
                                 <!-- Status: Surat sudah dicetak, menunggu upload foto -->
@@ -480,9 +490,13 @@ $ikon_printer = '
                                     <a href="<?= BASE_URL ?>/pages/laporan/detail_pelanggaran.php?nis=<?= $data_siswa['nis'] ?>&tanggal=<?= $data_siswa['tanggal_surat'] ?>">Detail Pelanggaran</a>
                                 </button>
                                 <hr>
-                                <button class="btn-primary">
-                                    <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_siswa.php?nis=<?= $data_siswa['nis'] ?>">Cetak Surat</a>
-                                </button>
+                                <?php if ($_can_print): ?>
+                                    <button class="btn-primary">
+                                        <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_siswa.php?nis=<?= $data_siswa['nis'] ?>">Cetak Surat</a>
+                                    </button>
+                                <?php else: ?>
+                                    <span style="color: #888;">Read-only</span>
+                                <?php endif; ?>
                                 <hr>
                                 <!-- Form upload foto dokumen yang sudah ditandatangani -->
                                 <form action="" method="post" enctype="multipart/form-data">
@@ -522,10 +536,12 @@ $ikon_printer = '
 <center>
 
     <!-- Tombol untuk langsung mencetak surat perjanjian orang tua baru -->
-    <button class="print-btn" onclick="window.location.href='<?= BASE_URL ?>/pages/cetak/add_perjanjian_ortu.php'">
-        <?= $ikon_printer ?>
-        &nbsp;&nbsp;Cetak Surat Perjanjian Ortu/Wali
-    </button><br>
+    <?php if ($_can_print): ?>
+        <button class="print-btn" onclick="window.location.href='<?= BASE_URL ?>/pages/cetak/add_perjanjian_ortu.php'">
+            <?= $ikon_printer ?>
+            &nbsp;&nbsp;Cetak Surat Perjanjian Ortu/Wali
+        </button><br>
+    <?php endif; ?>
 
     <fieldset style="width: 80%;">
         <legend>Daftar Surat Perjanjian Ortu/Wali</legend>
@@ -614,19 +630,27 @@ $ikon_printer = '
                                 );
                                 if (mysqli_num_rows($cek_surat_perjanjian_ortu) == 0) { ?>
                                     <hr>
-                                    <form action="<?= BASE_URL ?>/pages/cetak/add_perjanjian_ortu.php" method="post">
-                                        <input type="hidden" name="nis" value="<?= $data_ortu['nis'] ?>">
-                                        <input type="submit" value="Cetak Perjanjian Ortu" style="padding:10px 15px;font-weight:bold;background-color:#fff;border-radius:5px;border:1px solid #ccc;">
-                                    </form>
+                                    <?php if ($_can_print): ?>
+                                        <form action="<?= BASE_URL ?>/pages/cetak/add_perjanjian_ortu.php" method="post">
+                                            <input type="hidden" name="nis" value="<?= $data_ortu['nis'] ?>">
+                                            <input type="submit" value="Cetak Perjanjian Ortu" style="padding:10px 15px;font-weight:bold;background-color:#fff;border-radius:5px;border:1px solid #ccc;">
+                                        </form>
+                                    <?php else: ?>
+                                        <span style="color: #888;">Read-only</span>
+                                    <?php endif; ?>
                                 <?php }  } elseif ($data_ortu['status_dokumen'] == "Masih Proses") { ?>
                                 <!-- Status: Surat sudah dicetak, menunggu upload foto -->
                                 <button class="btn-primary">
                                     <a href="<?= BASE_URL ?>/pages/laporan/detail_pelanggaran.php?nis=<?= $data_ortu['nis'] ?>&tanggal=<?= $data_ortu['tanggal_surat'] ?>">Detail Pelanggaran</a>
                                 </button>
                                 <hr>
-                                <button class="btn-primary">
-                                    <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_ortu.php?nis=<?= $data_ortu['nis'] ?>">Cetak Surat</a>
-                                </button>
+                                <?php if ($_can_print): ?>
+                                    <button class="btn-primary">
+                                        <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_ortu.php?nis=<?= $data_ortu['nis'] ?>">Cetak Surat</a>
+                                    </button>
+                                <?php else: ?>
+                                    <span style="color: #888;">Read-only</span>
+                                <?php endif; ?>
                                 <hr>
                                 <form action="" method="post" enctype="multipart/form-data">
                                     <input type="hidden" name="tanggal_surat" value="<?= htmlspecialchars($data_ortu['tanggal_surat']) ?>">
@@ -730,9 +754,13 @@ $ikon_printer = '
                         <td><?= htmlspecialchars($data_laporan_siswa['tingkat']) ?></td>
                         <td>
                             <!-- Hanya tampilkan hasil cetak yang sudah selesai -->
-                            <button class="btn-primary">
-                                <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_siswa.php?nis=<?= $data_laporan_siswa['nis'] ?>" target="_blank">Cetak Ulang</a>
-                            </button>
+                            <?php if ($_can_print): ?>
+                                <button class="btn-primary">
+                                    <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_siswa.php?nis=<?= $data_laporan_siswa['nis'] ?>" target="_blank">Cetak Ulang</a>
+                                </button>
+                            <?php else: ?>
+                                <span style="color: #888;">Read-only</span>
+                            <?php endif; ?>
                             <hr>
                             <a href="<?= BASE_URL ?>/images/<?= htmlspecialchars($data_laporan_siswa['foto_dokumen']) ?>"
                                target="_blank" class="btn-primary"
@@ -823,9 +851,13 @@ $ikon_printer = '
                         <td><?= htmlspecialchars($data_laporan_ortu['tingkat']) ?></td>
                         <td>
                             <!-- Hanya tampilkan hasil cetak yang sudah selesai -->
-                            <button class="btn-primary">
-                                <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_ortu.php?nis=<?= $data_laporan_ortu['nis'] ?>" target="_blank">Cetak Ulang</a>
-                            </button>
+                            <?php if ($_can_print): ?>
+                                <button class="btn-primary">
+                                    <a href="<?= BASE_URL ?>/pages/cetak/surat_perjanjian_ortu.php?nis=<?= $data_laporan_ortu['nis'] ?>" target="_blank">Cetak Ulang</a>
+                                </button>
+                            <?php else: ?>
+                                <span style="color: #888;">Read-only</span>
+                            <?php endif; ?>
                             <hr>
                             <a href="<?= BASE_URL ?>/images/<?= htmlspecialchars($data_laporan_ortu['foto_dokumen']) ?>"
                                target="_blank" class="btn-primary"

@@ -2,6 +2,10 @@
 include_once __DIR__ . '/../../config/config.php';
 include ROOT_PATH . "/includes/header.php";
 
+smps_require_roles(['admin', 'bk', 'pengajar'], 'Akses ditolak. Halaman laporan hanya untuk admin/BK/pengajar.');
+
+$_can_print = smps_can_print_reports();
+
 // Query untuk mengambil siswa dengan total poin 50+ yang BELUM dicetak suratnya
 $result = mysqli_query($conn, "
     SELECT 
@@ -57,12 +61,14 @@ $surat_sudah = mysqli_query($conn, "
     <div>
         <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--mocha);">Pemanggilan Orang Tua</h2>
         <p style="color: #888;">Kelola administrasi panggilan orang tua berdasarkan akumulasi poin siswa.</p>
-    </div>
+</div>
     <div style="display: flex; gap: 10px;">
-        <a href="<?= BASE_URL ?>/pages/cetak/add_panggilan_ortu.php" class="btn btn-primary">
-            <i data-lucide="plus" style="width: 18px; vertical-align: middle; margin-right: 5px;"></i>
-            Cetak Surat Baru
-        </a>
+        <?php if ($_can_print): ?>
+            <a href="<?= BASE_URL ?>/pages/cetak/add_panggilan_ortu.php" class="btn btn-primary">
+                <i data-lucide="plus" style="width: 18px; vertical-align: middle; margin-right: 5px;"></i>
+                Cetak Surat Baru
+            </a>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -101,10 +107,14 @@ $surat_sudah = mysqli_query($conn, "
                         <div style="font-size: 1.2rem; font-weight: 700; color: var(--danger);"><?= htmlspecialchars($row['total_poin']) ?></div>
                     </td>
                     <td>
-                        <form action="<?= BASE_URL ?>/pages/cetak/add_panggilan_ortu.php" method="post">
-                            <input type="hidden" name="nis" value="<?= $row['nis'] ?>">
-                            <button type="submit" class="btn btn-primary" style="padding: 8px 15px; font-size: 0.8rem;">Cetak Panggilan</button>
-                        </form>
+                        <?php if ($_can_print): ?>
+                            <form action="<?= BASE_URL ?>/pages/cetak/add_panggilan_ortu.php" method="post">
+                                <input type="hidden" name="nis" value="<?= $row['nis'] ?>">
+                                <button type="submit" class="btn btn-primary" style="padding: 8px 15px; font-size: 0.8rem;">Cetak Panggilan</button>
+                            </form>
+                        <?php else: ?>
+                            <span style="color: #888;">Read-only</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endwhile; ?>
@@ -151,9 +161,13 @@ $surat_sudah = mysqli_query($conn, "
                     </td>
                     <td style="font-size: 0.85rem;"><?= htmlspecialchars($surat['keperluan']) ?></td>
                     <td>
-                        <a href="<?= BASE_URL ?>/pages/cetak/surat_panggilan_ortu.php?no_surat=<?= urlencode($surat['no_surat']) ?>" class="btn" style="background: var(--onyx); color: white; padding: 6px 12px; font-size: 0.75rem;">
-                            <i data-lucide="printer" style="width: 12px; vertical-align: middle; margin-right: 4px;"></i> Cetak Ulang
-                        </a>
+                        <?php if ($_can_print): ?>
+                            <a href="<?= BASE_URL ?>/pages/cetak/surat_panggilan_ortu.php?no_surat=<?= urlencode($surat['no_surat']) ?>" class="btn" style="background: var(--onyx); color: white; padding: 6px 12px; font-size: 0.75rem;">
+                                <i data-lucide="printer" style="width: 12px; vertical-align: middle; margin-right: 4px;"></i> Cetak Ulang
+                            </a>
+                        <?php else: ?>
+                            <span style="color: #888;">Read-only</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endwhile; ?>
